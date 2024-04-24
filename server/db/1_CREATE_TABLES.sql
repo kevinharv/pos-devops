@@ -1,0 +1,1 @@
+-- Create tables for POS server application

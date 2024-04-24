@@ -1,0 +1,5 @@
+.gitignore
+Dockerfile
+Makefile
+db.env
+docker-compose.yml
