@@ -8,5 +8,6 @@ ARG GO_VERSION=1.21
 # Install Go
 # Compile program
 # Copy to runner
+# Install curl (healthcheck)
 # Declare ports
 # Set entrypoint
