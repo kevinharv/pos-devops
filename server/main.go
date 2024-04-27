@@ -14,7 +14,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"log/slog"
 	"net/http"
 	"os"
@@ -28,27 +27,7 @@ import (
 	"github.com/kevinharv/pos-devops/server/utils"
 )
 
-func addRoutes(
-	mux *http.ServeMux,
-	logger *slog.Logger,
-	db *sql.DB,
-) {
-	mux.Handle("/", http.NotFoundHandler())
-	mux.Handle("/foo", middleware.LogRequest(routes.FooHandler(), logger))
 
-	mux.Handle("/v1/transaction/start", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/item/add", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/item/remove", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/checkout/start", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/checkout/payment", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/close", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/test", routes.ExampleTransactionHandler(logger))
-	
-	mux.Handle("/v1/item/lookup", http.NotFoundHandler())
-	mux.Handle("/v1/item/create", http.NotFoundHandler())
-	mux.Handle("/v1/item/update", http.NotFoundHandler())
-	mux.Handle("/v1/item/archive", http.NotFoundHandler())
-}
 
 func main() {
 	// Get config, setup logging, DB
@@ -67,11 +46,11 @@ func main() {
 
 	// Configure Routes
 	mux := http.NewServeMux()
-	addRoutes(mux, logger, db)
+	routes.AddRoutes(mux, logger, db)
 
 	s := &http.Server{
 		Addr:         config.ServerAddr,
-		Handler:      mux,
+		Handler:      middleware.LogRequest(mux, logger),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
