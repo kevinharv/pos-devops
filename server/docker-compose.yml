@@ -5,7 +5,7 @@ services:
     container_name: pos-server-db
     volumes:
       - dbdata:/var/lib/postgresql/data
-      - ./db:/docker-entrypoint-initdb.d/
+      - ./migrations:/docker-entrypoint-initdb.d/
     env_file:
       - db.env
     ports:

@@ -10,7 +10,7 @@ import (
 )
 
 func CreateConnection(c *utils.Config, logger *slog.Logger) (*sql.DB, error) {
-	connStr := fmt.Sprintf("postgresql://%s:%s@%s/%s?sslmode=disable", c.DBUser, c.DBPass, c.DBHost, c.DBDatabase)
+	connStr := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=disable", c.DBUser, c.DBPass, c.DBHost, c.DBPort, c.DBDatabase)
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
