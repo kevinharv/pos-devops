@@ -2,9 +2,10 @@
 CREATE TABLE IF NOT EXISTS items (
     itemID          BIGSERIAL    UNIQUE NOT NULL,
     categoryID      BIGINT       NOT NULL,
-    itemName        VARCHAR(32)  NOT NULL,
+    itemName        VARCHAR(128)  NOT NULL,
     itemDescription VARCHAR(255),
     price           MONEY        NOT NULL,
+    archived        BOOLEAN     DEFAULT(FALSE),
 
     created_at  TIMESTAMP  DEFAULT now(),
     
@@ -69,6 +70,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     paymentID     BIGINT,
     startTime     TIMESTAMP,
     endTime       TIMESTAMP,
+    archived      BOOLEAN     DEFAULT(FALSE),
 
     created_at  TIMESTAMP  DEFAULT now(),
 
