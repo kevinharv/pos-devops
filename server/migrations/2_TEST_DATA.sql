@@ -70,3 +70,5 @@ INSERT INTO pos (storeID, hostname) VALUES (2, 'S2POS1');
 INSERT INTO pos (storeID, hostname) VALUES (2, 'S2POS2');
 INSERT INTO pos (storeID, hostname) VALUES (3, 'S3POS1');
 INSERT INTO pos (storeID, hostname) VALUES (3, 'S3POS2');
+
+-- Create some transactions

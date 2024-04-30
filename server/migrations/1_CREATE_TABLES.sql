@@ -67,10 +67,11 @@ CREATE TABLE IF NOT EXISTS transactions (
     posID         BIGINT    NOT NULL,
     storeID       BIGINT,
     userID        BIGINT,
+    total         MONEY,
     paymentID     BIGINT,
+    archived      BOOLEAN     DEFAULT(FALSE),
     startTime     TIMESTAMP,
     endTime       TIMESTAMP,
-    archived      BOOLEAN     DEFAULT(FALSE),
 
     created_at  TIMESTAMP  DEFAULT now(),
 
