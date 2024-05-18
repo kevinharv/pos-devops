@@ -1,5 +1,22 @@
 ---
 services:
+  server:
+    image: kevharv/pos-server
+    build: .
+    container_name: pos-server
+    env_file:
+      - pos.env
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      - database
+
   database:
     image: postgres:16
     container_name: pos-server-db
