@@ -1,5 +1,20 @@
 ---
 services:
+  server:
+    build: .
+    container_name: pos-server
+    env_file: pos.env
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/healthz", "||", "exit", "1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      - database
+
   database:
     image: postgres:16
     container_name: pos-server-db
@@ -11,9 +26,9 @@ services:
     ports:
       - 5432:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "pos-server"]
       interval: 30s
-      timeout: 30s
+      timeout: 5s
       retries: 5
       start_period: 60s  
 

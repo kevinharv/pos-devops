@@ -8,6 +8,9 @@ FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 # Copy source files and build
 WORKDIR /src
+COPY go.mod .
+RUN go mod download
+
 COPY . .
 RUN go build -o /bin/server .
 

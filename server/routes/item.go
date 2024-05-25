@@ -12,6 +12,9 @@ import (
 
 func ItemByID(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusBadRequest)
+		}
 
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
@@ -42,20 +45,39 @@ func UpdateItemName(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusBadRequest)
+		}
 
+		// Decode request
 		data, err := utils.Decode[UpdateRequest](r)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
+		// Update item name in DB
 		err = models.UpdateName(logger, db, data.ItemID, data.Name)
 		if err != nil {
-			logger.Error("Item Request - Failed to Retrieve", "DB", err)
+			logger.Error("Item Request - Failed to Update", "DB", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
+		// Get DB item for response
+		item, err := models.GetItemByID(logger, db, data.ItemID)
+		if err != nil {
+			logger.Error("Item Request - Failed to Validate Update", "DB", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// Send newly updated item as response
+		err = utils.Encode(w, r, http.StatusOK, item)
+		if err != nil {
+			logger.Error("Failed to encode response")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 }
