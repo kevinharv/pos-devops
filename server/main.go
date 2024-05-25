@@ -14,6 +14,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -65,6 +66,7 @@ func main() {
 		err := s.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
 			l.Error("HTTP server closed unexpectedly\n")
+			l.Error(fmt.Sprintf("%s\n", err))
 		}
 	}(logger)
 

@@ -1,6 +1,7 @@
 ---
 services:
   server:
+    image: kevharv/pos-server
     build: .
     container_name: pos-server
     env_file: pos.env
@@ -11,7 +12,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 10s
     depends_on:
       - database
 
