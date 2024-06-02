@@ -12,6 +12,9 @@ func AddRoutes(
 	db *sql.DB,
 ) {
 	mux.Handle("/", http.NotFoundHandler())
+	mux.Handle("/healthz", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
 	mux.Handle("/foo", FooHandler())
 
 	mux.Handle("/v1/transaction/start", http.NotFoundHandler())

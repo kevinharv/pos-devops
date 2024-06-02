@@ -11,6 +11,8 @@ build:
 stop:
 	$(CR) compose down
 
+restart: stop run
+
 clean:
 	$(CR) compose down -v
 	$(CR) system prune
