@@ -21,6 +21,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"database/sql"
 
 	"github.com/kevinharv/pos-devops/server/middleware"
 	"github.com/kevinharv/pos-devops/server/models"
@@ -40,10 +41,20 @@ func main() {
 	logger := slog.New(jsonHandler)
 	
 	// Establish DB connection
-	db, err := models.CreateConnection(config, logger)
-	if err != nil {
-		panic(err)
+	var db *sql.DB
+	var err error
+	
+	for {
+		db, err = models.CreateConnection(config, logger)
+		
+		if err == nil {
+			break
+		}
+
+		logger.Error("Failed to connect to database")
+		time.Sleep(3 * time.Second)
 	}
+
 
 	// Configure Routes
 	mux := http.NewServeMux()
