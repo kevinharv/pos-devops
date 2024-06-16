@@ -1,4 +1,5 @@
 # POS Transactions App
+1. Write CORS middleware
 1. Write basic CRUD server app with DB
 1. Write basic tests for server
 1. Write client to interact/test server

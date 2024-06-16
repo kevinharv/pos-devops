@@ -38,6 +38,35 @@ func ItemByID(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 	}
 }
 
+func CreateItem(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
+	type CreateRequest struct {
+		CategoryID  int     `json:"categoryID"`
+		Name        string  `json:"name"`
+		Description string  `json:"description"`
+		Price       float64 `json:"price"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		data, err := utils.Decode[CreateRequest](r)
+		if err != nil {
+			logger.Error("Item Request - Failed to Decode", "Decoder", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		// Perform validation here (price is reasonable, values are present, etc.)
+
+		err = models.CreateItem(logger, db, data.CategoryID, data.Name, data.Description, data.Price)
+		if err != nil {
+			logger.Error("Item Request - Failed to Create", "DB", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+	}
+}
+
 func UpdateItemName(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 	type UpdateRequest struct {
 		ItemID int    `json:"itemID"`
@@ -76,6 +105,28 @@ func UpdateItemName(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 		err = utils.Encode(w, r, http.StatusOK, item)
 		if err != nil {
 			logger.Error("Failed to encode response")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+func ArchiveItem(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
+	type ArchiveRequest struct {
+		ItemID int `json:"itemID"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		data, err := utils.Decode[ArchiveRequest](r)
+		if err != nil {
+			logger.Error("Item Request - Failed to Decode", "Decoder", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		err = models.ArchiveItem(logger, db, data.ItemID)
+		if err != nil {
+			logger.Error("Item Request - Failed to Archive", "DB", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

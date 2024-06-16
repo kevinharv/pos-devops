@@ -53,6 +53,11 @@ func CreateItem(logger *slog.Logger, db *sql.DB, categoryID int, name string, de
 		return err
 	}
 
+	rows, err := res.RowsAffected()
+	if err == nil {
+		logger.Debug("DB INSERT", "Rows Affected", rows)
+	}
+
 	id, err := res.LastInsertId()
 	if err == nil {
 		logger.Debug("DB Item Created", "InsertID", id)
@@ -118,7 +123,7 @@ func UpdateCategory(logger *slog.Logger, db *sql.DB, itemID int, categoryID int)
 }
 
 func ArchiveItem(logger *slog.Logger, db *sql.DB, itemID int) error {
-	res, err := db.Exec("UPDATE items SET archived = true WHERE itemID = $2", itemID)
+	res, err := db.Exec("UPDATE items SET archived = true WHERE itemID = $1", itemID)
 	if err != nil {
 		return err
 	}

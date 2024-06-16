@@ -25,8 +25,8 @@ func AddRoutes(
 	mux.Handle("/v1/transaction/close", http.NotFoundHandler())
 	mux.Handle("/v1/transaction/test", ExampleTransactionHandler(logger))
 
-	mux.Handle("/v1/item/{id}", ItemByID(logger, db))
-	mux.Handle("/v1/item/create", http.NotFoundHandler())
-	mux.Handle("/v1/item/update", UpdateItemName(logger, db))
-	mux.Handle("/v1/item/archive", http.NotFoundHandler())
+	mux.Handle("GET /v1/item/{id}", ItemByID(logger, db))
+	mux.Handle("POST /v1/item/create", CreateItem(logger, db))
+	mux.Handle("POST /v1/item/update", UpdateItemName(logger, db))
+	mux.Handle("POST /v1/item/archive", ArchiveItem(logger, db))
 }
