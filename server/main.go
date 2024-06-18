@@ -56,13 +56,15 @@ func main() {
 	}
 
 
-	// Configure Routes
+	// Configure Routes, add middleware
 	mux := http.NewServeMux()
 	routes.AddRoutes(mux, logger, db)
+	loggedMux := middleware.LogRequest(mux, logger)
+	corsMux := middleware.CORSMiddleware(loggedMux)
 
 	s := &http.Server{
 		Addr:         config.ServerAddr,
-		Handler:      middleware.LogRequest(mux, logger),
+		Handler:      corsMux,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
