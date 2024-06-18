@@ -48,6 +48,15 @@ func GetItemByID(logger *slog.Logger, db *sql.DB, itemID int) (item Item, err er
 }
 
 func CreateItem(logger *slog.Logger, db *sql.DB, categoryID int, name string, description string, price float64) error {
+	itemsResult, err := db.Query("SELECT * FROM items WHERE categoryID = $1 AND itemName = $2 AND itemDescription = $3 AND price = $4", categoryID, name, description, price)
+	if err != nil {
+		return err
+	}
+
+	if itemsResult.Next() {
+		return fmt.Errorf("Item already exists")
+	}
+	
 	res, err := db.Exec("INSERT INTO items (categoryID, itemName, itemDescription, price) VALUES ($1, $2, $3, $4)", categoryID, name, description, price)
 	if err != nil {
 		return err
