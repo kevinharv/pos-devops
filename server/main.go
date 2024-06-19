@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"crypto/tls"
 	"syscall"
 	"time"
 	"database/sql"
@@ -39,10 +40,23 @@ func main() {
 		Level: config.LogLevel,
 	})
 	logger := slog.New(jsonHandler)
+
+
+	// Setup TLS
+	cert, err := tls.LoadX509KeyPair("/bin/cert.pem", "/bin/key.pem")
+    if err != nil {
+        logger.Error("TLS Error", "TLS", err)
+		logger.Error("TLS Failed - Exiting")
+		os.Exit(1)
+    }
+
+    // Create a TLS Config with the certificate
+    tlsConfig := &tls.Config{
+        Certificates: []tls.Certificate{cert},
+    }
 	
 	// Establish DB connection
 	var db *sql.DB
-	var err error
 	
 	for {
 		db, err = models.CreateConnection(config, logger)
@@ -67,6 +81,7 @@ func main() {
 		Handler:      corsMux,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
+		TLSConfig: tlsConfig,
 	}
 
 	// Create channel and handle OS signals
@@ -76,7 +91,7 @@ func main() {
 
 	// Run HTTP server in Goroutine
 	go func(l *slog.Logger) {
-		err := s.ListenAndServe()
+		err := s.ListenAndServeTLS("", "")	// certs loaded in config
 		if err != nil && err != http.ErrServerClosed {
 			l.Error("HTTP server closed unexpectedly\n")
 			l.Error(fmt.Sprintf("%s\n", err))
