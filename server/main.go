@@ -14,15 +14,15 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
-	"crypto/tls"
 	"syscall"
 	"time"
-	"database/sql"
 
 	"github.com/kevinharv/pos-devops/server/middleware"
 	"github.com/kevinharv/pos-devops/server/models"
@@ -30,37 +30,34 @@ import (
 	"github.com/kevinharv/pos-devops/server/utils"
 )
 
-
-
 func main() {
 	// Get config, setup logging, DB
 	config := utils.GetConfig()
-	
+
 	jsonHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: config.LogLevel,
 	})
 	logger := slog.New(jsonHandler)
 
-
 	// Setup TLS
 	cert, err := tls.LoadX509KeyPair("/bin/cert.pem", "/bin/key.pem")
-    if err != nil {
-        logger.Error("TLS Error", "TLS", err)
+	if err != nil {
+		logger.Error("TLS Error", "TLS", err)
 		logger.Error("TLS Failed - Exiting")
 		os.Exit(1)
-    }
+	}
 
-    // Create a TLS Config with the certificate
-    tlsConfig := &tls.Config{
-        Certificates: []tls.Certificate{cert},
-    }
-	
+	// Create a TLS Config with the certificate
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+	}
+
 	// Establish DB connection
 	var db *sql.DB
-	
+
 	for {
 		db, err = models.CreateConnection(config, logger)
-		
+
 		if err == nil {
 			break
 		}
@@ -68,7 +65,6 @@ func main() {
 		logger.Error("Failed to connect to database")
 		time.Sleep(3 * time.Second)
 	}
-
 
 	// Configure Routes, add middleware
 	mux := http.NewServeMux()
@@ -81,17 +77,16 @@ func main() {
 		Handler:      corsMux,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
-		TLSConfig: tlsConfig,
+		TLSConfig:    tlsConfig,
 	}
 
 	// Create channel and handle OS signals
 	exitChannel := make(chan os.Signal, 1)
 	signal.Notify(exitChannel, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-
 	// Run HTTP server in Goroutine
 	go func(l *slog.Logger) {
-		err := s.ListenAndServeTLS("", "")	// certs loaded in config
+		err := s.ListenAndServeTLS("", "") // certs loaded in config
 		if err != nil && err != http.ErrServerClosed {
 			l.Error("HTTP server closed unexpectedly\n")
 			l.Error(fmt.Sprintf("%s\n", err))

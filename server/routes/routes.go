@@ -27,6 +27,6 @@ func AddRoutes(
 
 	mux.Handle("GET /v1/item/{id}", ItemByID(logger, db))
 	mux.Handle("POST /v1/item/create", CreateItem(logger, db))
-	mux.Handle("POST /v1/item/update", UpdateItemName(logger, db))
+	mux.Handle("POST /v1/item/update", UpdateItem(logger, db))
 	mux.Handle("POST /v1/item/archive", ArchiveItem(logger, db))
 }
