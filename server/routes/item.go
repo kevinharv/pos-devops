@@ -26,8 +26,6 @@ func ItemByID(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 		item, err := models.GetItemByID(logger, db, id)
 		if err != nil {
 			logger.Error("Item Request - Failed to Retrieve", "DB", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
 		}
 
 		err = utils.Encode(w, r, http.StatusOK, item)

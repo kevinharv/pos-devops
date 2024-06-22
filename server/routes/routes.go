@@ -15,18 +15,17 @@ func AddRoutes(
 	mux.Handle("/healthz", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
-	mux.Handle("/foo", FooHandler())
 
-	mux.Handle("/v1/transaction/start", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/item/add", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/item/remove", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/checkout/start", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/checkout/payment", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/close", http.NotFoundHandler())
-	mux.Handle("/v1/transaction/test", ExampleTransactionHandler(logger))
+	mux.Handle("GET /v1/transaction/{id}", http.NotFoundHandler())
+	mux.Handle("POST /v1/transaction/start", http.NotFoundHandler())
+	mux.Handle("PUT /v1/transaction/item/add", http.NotFoundHandler())
+	mux.Handle("DELETE /v1/transaction/item/remove", http.NotFoundHandler())
+	mux.Handle("POST /v1/transaction/checkout/start", http.NotFoundHandler())
+	mux.Handle("POST /v1/transaction/checkout/payment", http.NotFoundHandler())
+	mux.Handle("POST /v1/transaction/close", http.NotFoundHandler())
 
 	mux.Handle("GET /v1/item/{id}", ItemByID(logger, db))
-	mux.Handle("POST /v1/item/create", CreateItem(logger, db))
-	mux.Handle("POST /v1/item/update", UpdateItem(logger, db))
-	mux.Handle("POST /v1/item/archive", ArchiveItem(logger, db))
+	mux.Handle("PUT /v1/item/create", CreateItem(logger, db))
+	mux.Handle("PATCH /v1/item/update", UpdateItem(logger, db))
+	mux.Handle("DELETE /v1/item/archive", ArchiveItem(logger, db))
 }

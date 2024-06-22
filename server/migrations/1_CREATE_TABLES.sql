@@ -89,3 +89,20 @@ CREATE TABLE IF NOT EXISTS transactions (
         ON UPDATE CASCADE
         ON DELETE SET NULL
 );
+
+-- Create transaction items table
+CREATE TABLE IF NOT EXISTS transaction_items (
+    transactionID BIGINT NOT NULL,
+    itemID        BIGINT NOT NULL,
+    quantity      INTEGER,
+
+    created_at TIMESTAMP DEFAULT now(),
+
+    PRIMARY KEY (transactionID, itemID),
+    FOREIGN KEY (transactionID) REFERENCES transactions(transactionID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (itemID) REFERENCES items(itemID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
