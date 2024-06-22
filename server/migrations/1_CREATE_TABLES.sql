@@ -64,11 +64,12 @@ CREATE TABLE IF NOT EXISTS pos (
 -- Create transactions table
 CREATE TABLE IF NOT EXISTS transactions (
     transactionID BIGSERIAL UNIQUE NOT NULL,
-    posID         BIGINT    NOT NULL,
+    status        VARCHAR(16) NOT NULL,
+    posID         BIGINT      NOT NULL,
     storeID       BIGINT,
     userID        BIGINT,
-    total         MONEY,
-    paymentID     BIGINT,
+    total         MONEY       DEFAULT 0,
+    paymentID     BIGINT      DEFAULT 0,
     archived      BOOLEAN     DEFAULT(FALSE),
     startTime     TIMESTAMP,
     endTime       TIMESTAMP,
@@ -84,21 +85,24 @@ CREATE TABLE IF NOT EXISTS transactions (
         ON DELETE SET NULL,
     FOREIGN KEY (userID) REFERENCES users(userID)
         ON UPDATE CASCADE
-        ON DELETE NO ACTION,
-    FOREIGN KEY (paymentID) REFERENCES payments(paymentID)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE NO ACTION
+    
+    -- Removed to prevent issues with insertion
+    -- FOREIGN KEY (paymentID) REFERENCES payments(paymentID)
+    --     ON UPDATE CASCADE
+    --     ON DELETE SET NULL
 );
 
 -- Create transaction items table
 CREATE TABLE IF NOT EXISTS transaction_items (
+    entryID       BIGSERIAL NOT NULL,
     transactionID BIGINT NOT NULL,
     itemID        BIGINT NOT NULL,
     quantity      INTEGER,
 
     created_at TIMESTAMP DEFAULT now(),
 
-    PRIMARY KEY (transactionID, itemID),
+    PRIMARY KEY (entryID),
     FOREIGN KEY (transactionID) REFERENCES transactions(transactionID)
         ON UPDATE CASCADE
         ON DELETE CASCADE,

@@ -1,16 +1,16 @@
-package item
+package transaction
 
 import (
-	"database/sql"
 	"log/slog"
 	"net/http"
+	"database/sql"
 	"strconv"
 
 	"github.com/kevinharv/pos-devops/server/models"
 	"github.com/kevinharv/pos-devops/server/utils"
 )
 
-func ItemByID(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
+func TransactionByID(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
@@ -19,7 +19,7 @@ func ItemByID(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		item, err := models.GetItemByID(logger, db, id)
+		item, err := models.GetTransactionByID(logger, db, id)
 		if err != nil {
 			logger.Error("Item Request - Failed to Retrieve", "DB", err)
 		}

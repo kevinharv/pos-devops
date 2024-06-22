@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/kevinharv/pos-devops/server/routes/item"
+	"github.com/kevinharv/pos-devops/server/routes/transaction"
 )
 
 func AddRoutes(
@@ -19,7 +20,7 @@ func AddRoutes(
 	}))
 
 	mux.Handle("GET /v1/transaction/{id}", http.NotFoundHandler())
-	mux.Handle("POST /v1/transaction/start", http.NotFoundHandler())
+	mux.Handle("POST /v1/transaction/start", transaction.StartTransaction(logger, db))
 	mux.Handle("PUT /v1/transaction/item/add", http.NotFoundHandler())
 	mux.Handle("DELETE /v1/transaction/item/remove", http.NotFoundHandler())
 	mux.Handle("POST /v1/transaction/checkout/start", http.NotFoundHandler())
