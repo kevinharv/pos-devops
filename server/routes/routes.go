@@ -19,10 +19,10 @@ func AddRoutes(
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	mux.Handle("GET /v1/transaction/{id}", http.NotFoundHandler())
+	mux.Handle("GET /v1/transaction/{id}", transaction.TransactionByID(logger, db))
 	mux.Handle("POST /v1/transaction/start", transaction.StartTransaction(logger, db))
 	mux.Handle("PUT /v1/transaction/item/add", transaction.AddItemToTransaction(logger, db))
-	mux.Handle("DELETE /v1/transaction/item/remove", http.NotFoundHandler())
+	mux.Handle("DELETE /v1/transaction/item/remove", transaction.RemoveItemFromTransaction(logger, db))
 	mux.Handle("POST /v1/transaction/checkout/start", http.NotFoundHandler())
 	mux.Handle("POST /v1/transaction/checkout/payment", http.NotFoundHandler())
 	mux.Handle("POST /v1/transaction/close", http.NotFoundHandler())

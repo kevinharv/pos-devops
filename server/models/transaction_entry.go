@@ -28,6 +28,23 @@ func GetTransactionEntry(logger *slog.Logger, db *sql.DB, entryID int) (*Transac
 	return &entry, nil
 }
 
+func AllTransactionEntries(logger *slog.Logger, db *sql.DB, transactionID int) (*[]TransactionEntry, error) {
+
+	rows, err := db.Query("SELECT * FROM transaction_items WHERE transactionID = $1", transactionID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve items for transaction %d", transactionID)
+	}
+
+	var entry TransactionEntry
+	var entries []TransactionEntry
+	for rows.Next() {
+		rows.Scan(&entry.EntryID, &entry.TransactionID, &entry.ItemID, &entry.CreatedAt)
+		entries = append(entries, entry)
+	}
+
+	return &entries, nil
+}
+
 // Add item to transaction
 func AddItemToTransaction(logger *slog.Logger, db *sql.DB, transactionID int, itemID int) (*TransactionEntry, error) {
 
@@ -68,3 +85,23 @@ func AddItemToTransaction(logger *slog.Logger, db *sql.DB, transactionID int, it
 }
 
 // Remove item from transaction
+func RemoveItemFromTransaction(logger *slog.Logger, db *sql.DB, entryID int) (error) {
+
+	var transactionStatus string
+	res := db.QueryRow("SELECT status FROM transaction_items JOIN transactions ON transaction_items.transactionID = transactions.transactionID WHERE entryID = $1", entryID)
+	err := res.Scan(&transactionStatus)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve transaction")
+	}	
+
+	if transactionStatus != "ACTIVE" {
+		return fmt.Errorf("transaction not in ACTIVE status - cannot remove entry")
+	}
+
+	_, err = db.Exec("DELETE FROM transaction_items WHERE entryID = $1", entryID)
+	if err != nil {
+		return fmt.Errorf("failed to delete entry %d from the transaction", entryID)
+	}
+
+	return nil
+}

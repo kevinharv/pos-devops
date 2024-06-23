@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
 )
 
 type Transaction struct {
@@ -18,6 +19,8 @@ type Transaction struct {
 	Total         float64 `json:"total"`
 	PaymentID     *int    `json:"paymentID"`
 	Archived      bool    `json:"archived"`
+
+	Entries 	*[]TransactionEntry	`json:"entries"`
 
 	StartTime   time.Time  `json:"startTime"`
 	EndTime     *time.Time `json:"endTime"`
@@ -64,6 +67,14 @@ func GetTransactionByID(logger *slog.Logger, db *sql.DB, transactionID int) (Tra
 	if err != nil {
 		return Transaction{}, err
 	}
+
+	entries, err := AllTransactionEntries(logger, db, transactionID)
+	if err != nil {
+		logger.Error("Transaction - Failed to retrieve entries")
+		return Transaction{}, err
+	}
+
+	dbItem.Entries = entries
 
 	res.Close()
 	return dbItem, nil
