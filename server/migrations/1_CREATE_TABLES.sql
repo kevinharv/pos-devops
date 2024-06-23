@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     storeID       BIGINT,
     userID        BIGINT,
     total         MONEY       DEFAULT 0,
-    paymentID     BIGINT      DEFAULT 0,
+    paymentID     BIGINT,
     archived      BOOLEAN     DEFAULT(FALSE),
     startTime     TIMESTAMP,
     endTime       TIMESTAMP,
@@ -85,12 +85,10 @@ CREATE TABLE IF NOT EXISTS transactions (
         ON DELETE SET NULL,
     FOREIGN KEY (userID) REFERENCES users(userID)
         ON UPDATE CASCADE
-        ON DELETE NO ACTION
-    
-    -- Removed to prevent issues with insertion
-    -- FOREIGN KEY (paymentID) REFERENCES payments(paymentID)
-    --     ON UPDATE CASCADE
-    --     ON DELETE SET NULL
+        ON DELETE NO ACTION,
+    FOREIGN KEY (paymentID) REFERENCES payments(paymentID)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 );
 
 -- Create transaction items table
@@ -98,7 +96,6 @@ CREATE TABLE IF NOT EXISTS transaction_items (
     entryID       BIGSERIAL NOT NULL,
     transactionID BIGINT NOT NULL,
     itemID        BIGINT NOT NULL,
-    quantity      INTEGER,
 
     created_at TIMESTAMP DEFAULT now(),
 

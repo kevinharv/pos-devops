@@ -4,23 +4,38 @@ import (
 	"database/sql"
 	"log/slog"
 	"net/http"
+
+	"github.com/kevinharv/pos-devops/server/models"
+	"github.com/kevinharv/pos-devops/server/utils"
 )
 
 func AddItemToTransaction(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 	type AddItemRequest struct {
-		Foo int
+		TransactionID int `json:"transactionID"`
+		ItemID 		  int `json:"itemID"`
 	}
 	
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Check item is valid
-			// Exists, not archived
-		// Check transaction is valid
-			// Correct status
+		data, err := utils.Decode[AddItemRequest](r)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 
-		// Add item to transaction
+		transaction, err := models.AddItemToTransaction(logger, db, data.TransactionID, data.ItemID)
+		if err != nil {
+			logger.Error("Transaction - Failed to add item", "DB", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		
+		// TODO - Calculate total and update
 
-		// Calculate total and update
-
-		// Return current transaction state?
+		err = utils.Encode(w, r, http.StatusCreated, transaction)
+		if err != nil {
+			logger.Error("Transaction - Failed to encode", "Encoder", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 }

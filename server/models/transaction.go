@@ -13,21 +13,23 @@ type Transaction struct {
 	TransactionID int     `json:"transactionID"`
 	Status        string  `json:"status"`
 	POS_ID        int     `json:"posID"`
-	StoreID       int     `json:"storeID"`
-	UserID        int     `json:"userID"`
+	StoreID       *int    `json:"storeID"`
+	UserID        *int    `json:"userID"`
 	Total         float64 `json:"total"`
-	PaymentID     int     `json:"paymentID"`
+	PaymentID     *int    `json:"paymentID"`
 	Archived      bool    `json:"archived"`
 
-	StartTime   string `json:"startTime"`
-	EndTime     sql.NullTime `json:"endTime"`
-	CreatedDate string `json:"createdDate"`
+	StartTime   time.Time  `json:"startTime"`
+	EndTime     *time.Time `json:"endTime"`
+	CreatedDate time.Time  `json:"createdDate"`
 }
 
 func CreateTransaction(logger *slog.Logger, db *sql.DB, posID int, storeID int, userID int) (Transaction, error) {
-	
-	// TODO - ensure user, POS do not have active or pending transactions before starting new
-	
+
+	// Do on route?
+	// TODO - check POS has no active or pending transactions
+	// TODO - if user, check they have no active or pending transactions
+
 	transactionStartTimestamp := time.Now()
 
 	var transactionID int
