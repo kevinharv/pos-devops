@@ -81,6 +81,8 @@ func AddItemToTransaction(logger *slog.Logger, db *sql.DB, transactionID int, it
 		return nil, fmt.Errorf("failed to add item %d to transaction %d", itemID, transactionID)
 	}
 
+	updateTransactionTotal(logger, db, transactionID)
+
 	return GetTransactionEntry(logger, db, entryID)
 }
 
@@ -88,8 +90,9 @@ func AddItemToTransaction(logger *slog.Logger, db *sql.DB, transactionID int, it
 func RemoveItemFromTransaction(logger *slog.Logger, db *sql.DB, entryID int) (error) {
 
 	var transactionStatus string
-	res := db.QueryRow("SELECT status FROM transaction_items JOIN transactions ON transaction_items.transactionID = transactions.transactionID WHERE entryID = $1", entryID)
-	err := res.Scan(&transactionStatus)
+	var transactionID int
+	res := db.QueryRow("SELECT a.transactionID, b.status FROM transaction_items a JOIN transactions b ON a.transactionID = b.transactionID WHERE entryID = $1", entryID)
+	err := res.Scan(&transactionID, &transactionStatus)
 	if err != nil {
 		return fmt.Errorf("failed to retrieve transaction")
 	}	
@@ -103,5 +106,16 @@ func RemoveItemFromTransaction(logger *slog.Logger, db *sql.DB, entryID int) (er
 		return fmt.Errorf("failed to delete entry %d from the transaction", entryID)
 	}
 
+	updateTransactionTotal(logger, db, transactionID)
+
 	return nil
+}
+
+
+// Calculate and update the transaction total
+func updateTransactionTotal(logger *slog.Logger, db *sql.DB, transactionID int) {
+	_, err := db.Exec("UPDATE transactions SET total = (SELECT SUM(price) FROM transaction_items a JOIN items b ON a.itemID = b.itemID WHERE transactionID = $1)", transactionID)
+	if err != nil {
+		logger.Error("failed to update price for transaction %d", transactionID)
+	}
 }
