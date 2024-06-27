@@ -116,6 +116,6 @@ func RemoveItemFromTransaction(logger *slog.Logger, db *sql.DB, entryID int) (er
 func updateTransactionTotal(logger *slog.Logger, db *sql.DB, transactionID int) {
 	_, err := db.Exec("UPDATE transactions SET total = (SELECT SUM(price) FROM transaction_items a JOIN items b ON a.itemID = b.itemID WHERE transactionID = $1)", transactionID)
 	if err != nil {
-		logger.Error("failed to update price for transaction %d", transactionID)
+		logger.Error("Transaction Total Update Failed", "Transaction #", transactionID)
 	}
 }
