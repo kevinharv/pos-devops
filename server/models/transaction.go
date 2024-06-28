@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
 )
 
 type Transaction struct {
@@ -20,7 +19,7 @@ type Transaction struct {
 	PaymentID     *int    `json:"paymentID"`
 	Archived      bool    `json:"archived"`
 
-	Entries 	*[]TransactionEntry	`json:"entries"`
+	Entries *[]TransactionEntry `json:"entries"`
 
 	StartTime   time.Time  `json:"startTime"`
 	EndTime     *time.Time `json:"endTime"`
