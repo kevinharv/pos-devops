@@ -3,6 +3,8 @@ package models
 import (
 	"context"
 	"database/sql"
+	"log/slog"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -49,6 +51,31 @@ func TestCreateItem(t *testing.T) {
 	err = db.Ping()
 	if err != nil {
 		t.Fatalf("failed to ping DB")
+	}
+
+	// testItem := Item{
+	// 	Name: "Test Item",
+	// 	CategoryID: 1,
+	// 	Description: "Item used for integration testing.",
+	// 	Price: 4.98,
+	// 	Archived: false,
+	// 	CreatedDate: time.Now().String(),
+	// }
+
+	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{})
+	logger := slog.New(handler)
+	err = CreateItem(logger, db, 1, "Test Item", "Item for integration testing.", 4.98)
+	if err != nil {
+		t.Fatalf("failed to create item in DB")
+	}
+
+	item, err := GetItemByID(logger, db, 1)
+	if err != nil {
+		t.Fatalf("Failed to retrieve item")
+	}
+
+	if item.Name != "Test Item" {
+		t.Fatalf("Item name did not match expected")
 	}
 
 	// TODO
