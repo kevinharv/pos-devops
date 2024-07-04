@@ -19,32 +19,33 @@ type Item struct {
 	CreatedDate string `json:"createdDate"`
 }
 
-func GetItemByID(logger *slog.Logger, db *sql.DB, itemID int) (item Item, err error) {
+func GetItemByID(logger *slog.Logger, db *sql.DB, itemID int) (item *Item, err error) {
 	res, err := db.Query("SELECT * FROM items WHERE itemID = $1", itemID)
 	if err != nil {
-		return Item{}, err
+		return nil, err
 	}
+	defer res.Close()
 
 	hasRecord := res.Next()
 	if !hasRecord {
-		return Item{}, fmt.Errorf("no records available")
+		return nil, fmt.Errorf("no records available")
 	}
 	
 	dbItem := Item{}
 	var priceString string
 	err = res.Scan(&dbItem.ItemID, &dbItem.CategoryID, &dbItem.Name, &dbItem.Description, &priceString, &dbItem.Archived, &dbItem.CreatedDate)
 	if err != nil {
-		return Item{}, err
+		return nil, err
 	}
 
 	priceString, _ = strings.CutPrefix(priceString, "$")
 	dbItem.Price, err = strconv.ParseFloat(priceString, 64)
 	if err != nil {
-		return Item{}, err
+		return nil, err
 	}
 
 	res.Close()
-	return dbItem, nil
+	return &dbItem, nil
 }
 
 func CreateItem(logger *slog.Logger, db *sql.DB, categoryID int, name string, description string, price float64) error {
@@ -52,6 +53,7 @@ func CreateItem(logger *slog.Logger, db *sql.DB, categoryID int, name string, de
 	if err != nil {
 		return err
 	}
+	defer itemsResult.Close()
 
 	if itemsResult.Next() {
 		return fmt.Errorf("Item already exists")

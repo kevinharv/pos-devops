@@ -103,15 +103,13 @@ func main() {
 	// Create context and give 5 seconds to timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer func() {
-		// Close logstreams?
-		// Any extra shutdown handling
 		models.CloseConnection(db, logger)
 		cancel()
 	}()
 
 	// Shutdown the HTTP server
 	if err := s.Shutdown(ctx); err != nil {
-		logger.Error("Server Shutdown Failed:%+v", err)
+		logger.Error("Server Shutdown Failed", "HTTP Server Error", err)
 	}
 	logger.Info("Server Shutdown Properly")
 }

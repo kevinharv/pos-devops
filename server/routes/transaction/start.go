@@ -11,11 +11,11 @@ import (
 
 func StartTransaction(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 	type StartTransactionRequest struct {
-		POS_ID int `json:"posID"`
+		POS_ID  int `json:"posID"`
 		StoreID int `json:"storeID"`
-		UserID int `json:"userID"`
+		UserID  int `json:"userID"`
 	}
-	
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		data, err := utils.Decode[StartTransactionRequest](r)
 		if err != nil {
