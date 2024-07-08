@@ -29,8 +29,6 @@ func AddItemToTransaction(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 			return
 		}
 		
-		// TODO - Calculate total and update
-
 		err = utils.Encode(w, r, http.StatusCreated, transaction)
 		if err != nil {
 			logger.Error("Transaction - Failed to encode", "Encoder", err)

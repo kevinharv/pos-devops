@@ -29,8 +29,6 @@ func RemoveItemFromTransaction(logger *slog.Logger, db *sql.DB) http.HandlerFunc
 			return
 		}
 		
-		// TODO - recalculate total
-
 		w.WriteHeader(http.StatusOK)
 	}
 }

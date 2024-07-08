@@ -111,6 +111,26 @@ func UpdateStatus(logger *slog.Logger, db *sql.DB, transactionID int, status str
 	return nil
 }
 
+func SetTransactionPayment(logger *slog.Logger, db *sql.DB, transactionID int, paymentID int) error {
+	// Check if payment exists
+	rows, err := db.Query("SELECT * FROM payments WHERE paymentID = $1", paymentID)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve payment ID %d", paymentID)
+	}
+
+	if !rows.Next() {
+		return fmt.Errorf("payment %d does not exist", paymentID)
+	}
+
+	// Set payment
+	_, err = db.Exec("UPDATE transactions SET paymentID = $1 WHERE transactionID = $2", paymentID, transactionID)
+	if err != nil {
+		return fmt.Errorf("failed to set transaction %d to payment %d", transactionID, paymentID)
+	}
+
+	return nil
+}
+
 func validateStatus(status string) bool {
 	switch status {
 	case "ACTIVE", "CHECKOUT", "ERROR_INCOMPLETE", "ERROR_COMPLETE", "COMPLETE", "CANCELLED":
