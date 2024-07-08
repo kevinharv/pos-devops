@@ -15,8 +15,9 @@ func StartCheckout(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 
 func CollectPayment(logger *slog.Logger, db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Take payment
+		// Take payment - create entry in payments table
 		// Apply to transaction
-		// If sufficient, close transaction
+		// Charge the method, if successful, close transaction
+			// Close directly, not via route
 	}
 }
