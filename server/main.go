@@ -31,7 +31,7 @@ import (
 )
 
 func main() {
-	// Get config, setup logging, DB
+	// Get config, setup logging
 	config := utils.GetConfig()
 
 	jsonHandler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
